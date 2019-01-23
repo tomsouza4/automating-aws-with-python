@@ -17,20 +17,27 @@ import click
 
 from bucket import BucketManager
 
+"""This variable holds the session of a user and will be useful when
+user inputs which session will be used default=pythonAutomation for now."""
 session = None
 bucket_manager = None
 
 @click.group()
 @click.option('--profile', default=None,
-    help="Use a given AWS profile")
+              help="Use a given AWS profile")
 def cli(profile):
     """Webotron deploys websites to AWS."""
+
+    """Makes these variables global."""
     global session, bucket_manager
-    
+
+    """Sets which session will be used."""
     session_cfg = {}
     if profile:
         session_cfg['profile_name'] = profile
 
+    """***session_cfg will decouple the dictionary and make it easy to pass
+    as a param."""
     session = boto3.Session(**session_cfg)
     bucket_manager = BucketManager(session)
 
@@ -70,6 +77,7 @@ def setup_bucket(bucket):
 def sync(pathname, bucket):
     """Sync contents of PATHNAME to BUCKET."""
     bucket_manager.sync(pathname, bucket)
+    print(bucket_manager.get_bucket_url(bucket_manager.s3.Bucket(bucket)))
 
 
 if __name__ == '__main__':
